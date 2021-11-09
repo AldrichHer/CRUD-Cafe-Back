@@ -8,17 +8,17 @@ const router = Router();
 
 router.get('/:id', getUser);
 router.get('/', getUsers);
-router.put('/',putUsers);
-router.post('/',[
-    check('name','Name is required').notEmpty(),    
-    check('email','Email is not valid').isEmail(),    
+router.put('/', putUsers);
+router.post('/', [
+    check('name', 'Name is required').notEmpty(),
+    check('email', 'Email is not valid').isEmail(),
     check('email').custom(checkEmail),
-    check('password','Password must be at least 6 characters long').isLength({min:6}),
-    check('password','Password is required').notEmpty(),
+    check('password', 'Password must be at least 6 characters long').isLength({ min: 6 }),
+    check('password', 'Password is required').notEmpty(),
     // check('role','Role is not valid').isIn(['ADMIN_ROLE','USER_ROLE']),
-    check('role').custom( validRole ),
+    check('role').custom(validRole),
     checkValidation
-] ,postUsers);
+], postUsers);
 router.delete('/', deleteUsers);
 
 
