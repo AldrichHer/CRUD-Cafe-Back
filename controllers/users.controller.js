@@ -21,9 +21,19 @@ const getUsers = (req = request, res = response) => {
     });
 };
 
-const putUsers = (req = request, res = response) => {
+const putUsers = async (req = request, res = response) => {
+    const {id} = req.params;
+    const {_id,password, google, email,...rest}  = req.body;
+
+    if(password){
+    //Hash de contraseña
+    const salt  = bcryptjs.genSaltSync(10);
+    rest.password = bcryptjs.hashSync(password,salt);
+    }
+    const user = await Usuario.findByIdAndUpdate(id,rest)
     res.json({
-        message: "PUT users desde API"
+        // message: "PUT users desde API",
+        user
     });
 };
 
