@@ -12,25 +12,38 @@ const getUser = (req = request, res = response) => {
     })
 };
 
-const getUsers = (req = request, res = response) => {
-    const { id = 0, name } = req.query;
+const getUsers = async (req = request, res = response) => {
+    let { limit = 5, from = 0 } = req.query;
+    const stateFind = {state: true}
+
+    typeof(limit) != 'number'? limit = 5: limit = limit;
+    typeof(from) != 'number'? from = 5: from = from;
+
+    const [total,users] = await Promise.all([
+        Usuario.countDocuments(stateFind),
+        Usuario.find(stateFind)
+            .skip(Number(from))
+            .limit(Number(limit))
+
+    ]);
+
     res.json({
-        message: "GET users desde el controller de API",
-        id,
-        name
+        total,
+        users
+        // message: "GET users desde el controller de API",
     });
 };
 
 const putUsers = async (req = request, res = response) => {
-    const {id} = req.params;
-    const {_id,password, google, email,...rest}  = req.body;
+    const { id } = req.params;
+    const { _id, password, google, email, ...rest } = req.body;
 
-    if(password){
-    //Hash de contraseña
-    const salt  = bcryptjs.genSaltSync(10);
-    rest.password = bcryptjs.hashSync(password,salt);
+    if (password) {
+        //Hash de contraseña
+        const salt = bcryptjs.genSaltSync(10);
+        rest.password = bcryptjs.hashSync(password, salt);
     }
-    const user = await Usuario.findByIdAndUpdate(id,rest)
+    const user = await Usuario.findByIdAndUpdate(id, rest)
     res.json({
         // message: "PUT users desde API",
         user
@@ -41,12 +54,12 @@ const postUsers = async (req = request, res = response) => {
 
 
     // const { name, age } = req.body;
-    const {name, email, password, role} = req.body;
-    const usuario = new Usuario( {name, email, password, role} );
-    
+    const { name, email, password, role } = req.body;
+    const usuario = new Usuario({ name, email, password, role });
+
     //Hash de contraseña
-    const salt  = bcryptjs.genSaltSync(10);
-    usuario.password = bcryptjs.hashSync(password,salt);
+    const salt = bcryptjs.genSaltSync(10);
+    usuario.password = bcryptjs.hashSync(password, salt);
     //Guardar
     await usuario.save();
 
@@ -56,9 +69,18 @@ const postUsers = async (req = request, res = response) => {
     });
 };
 
-const deleteUsers = (req = request, res = response) => {
+const deleteUsers = async (req = request, res = response) => {
+    const {id} = req.params;
+    //BORRADO FISICO
+    // const user = await Usuario.findByIdAndDelete(id);
+
+    //CAMBIAR STATE
+    const user = await Usuario.findOneAndUpdate(id,{state:false});
+
     res.json({
-        message: "DELETE users desde API"
+        id:id,
+        // message: "DELETE users desde API"
+        user
     });
 };
 

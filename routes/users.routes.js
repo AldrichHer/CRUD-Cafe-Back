@@ -24,7 +24,11 @@ router.post('/', [
     check('role').custom(validRole),
     checkValidation
 ], postUsers);
-router.delete('/', deleteUsers);
+router.delete('/:id',[
+    check('id','ID is not valid').isMongoId(),
+    check('id').custom(checkIfId),
+    checkValidation
+], deleteUsers);
 
 
 
